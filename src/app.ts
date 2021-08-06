@@ -23,8 +23,8 @@ app.post("/sign-in", userController.signIn);
 
 app.get("/pokemons", authMiddleware, pokemonController.getAllPokemons);
 
-app.post("/my-pokemons/:id/add", authMiddleware,pokemonController.AddMyPokemons)
-app.post("/my-pokemons/:id/remove", authMiddleware,pokemonController.removeFromMyPokemons)
+app.post("/my-pokemons/:id/add", authMiddleware,pokemonController.AddMyPokemons);
+app.post("/my-pokemons/:id/remove", authMiddleware,pokemonController.removeFromMyPokemons);
 
 export async function init () {
   await connectDatabase();
