@@ -3,6 +3,7 @@ import faker from "faker";
 import bcrypt from "bcrypt";
 
 import User from "../../src/entities/User";
+import Session from "../../src/entities/Session";
 
 interface user{
   email: string,
@@ -34,3 +35,13 @@ export async function insertUser (user:user) :Promise <User> {
   return newUser;
 }
 
+
+export async function createSession(email:string,userId:number):Promise<string>{     
+    const token = faker.internet.password();
+    
+    const repository = getRepository(Session);
+
+    const result = await repository.insert({token,userId});
+   
+    return token;
+  }

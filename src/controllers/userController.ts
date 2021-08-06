@@ -7,7 +7,6 @@ import * as userService from "../services/userService";
 
 export async function signUp(req:Request, res: Response) {
   const {email,password}=req.body as {email:string, password :string};
-  console.log("aaaaaa");
   const { error } = signUpSchema.validate(req.body);
   if (error) return res.sendStatus(400);
 

@@ -4,7 +4,7 @@ import Pokemon from "../entities/Pokemon";
 import UserPokemons from "../entities/userPokemons";
 
 
-export async function MyPokemons(userId:number){
+export async function MyPokemons(userId:number):Promise <number[]> {
     const pokemons= await getRepository(UserPokemons).find({ where: { userId} });
     let pokemonsID = [];
 
@@ -17,12 +17,11 @@ export async function MyPokemons(userId:number){
     };
   }
 
-export async function getPokemons (userId:number) {
+export async function getPokemons (userId:number): Promise <Pokemon[]> {
 
   const pokemons = await getRepository(Pokemon).find();
   
   const myList = await MyPokemons(userId)
-   console.log(myList)
 
    pokemons.map((p)=> {
        if(myList.includes(p.id)) p.inMyPokemons=true;
@@ -31,7 +30,7 @@ export async function getPokemons (userId:number) {
   return pokemons;
 }
 
-export async function addToMyPokemons (userId: number, pokemonId: number) {
+export async function addToMyPokemons (userId: number, pokemonId: number):Promise <Boolean> {
 
     const user = await getRepository(UserPokemons).find({ where: { userId } });
     let alreadyMine = false;
@@ -44,14 +43,6 @@ export async function addToMyPokemons (userId: number, pokemonId: number) {
     if (alreadyMine) return false;
 
      await getRepository(UserPokemons).insert({ userId, pokemonId });
-
-     await getConnection()
-     .createQueryBuilder()
-     .update(Pokemon)
-     .set({ inMyPokemons: true })
-     .where("id = :id", { id: pokemonId })
-     .execute();
-
       return true;
   }
 

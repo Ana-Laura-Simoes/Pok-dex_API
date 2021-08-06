@@ -5,6 +5,7 @@ import app, { init } from "../../src/app";
 import { createUser , createInvalidUser, insertUser} from "../factories/userFactory";
 import { clearDatabase } from "../utils/database";
 
+
 beforeAll(async () => {
   await init();
 });
@@ -14,7 +15,9 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await clearDatabase();
   await getConnection().close();
+  
 });
 
 
