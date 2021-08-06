@@ -1,9 +1,75 @@
-import { getRepository } from "typeorm";
+import { getRepository, getConnection } from "typeorm";
 
 import Pokemon from "../entities/Pokemon";
+import UserPokemons from "../entities/userPokemons";
 
 
-export async function getPokemons () {
+export async function MyPokemons(userId:number){
+    const pokemons= await getRepository(UserPokemons).find({ where: { userId} });
+    let pokemonsID = [];
+
+    if(!pokemons) return null;  
+    else {
+       pokemonsID = pokemons.map((p)=>{
+        return p.pokemonId
+       });
+        return pokemonsID;   
+    };
+  }
+
+export async function getPokemons (userId:number) {
+
   const pokemons = await getRepository(Pokemon).find();
+  
+  const myList = await MyPokemons(userId)
+   console.log(myList)
+
+   pokemons.map((p)=> {
+       if(myList.includes(p.id)) p.inMyPokemons=true;
+       else p.inMyPokemons=false;
+   })
   return pokemons;
 }
+
+export async function addToMyPokemons (userId: number, pokemonId: number) {
+
+    const user = await getRepository(UserPokemons).find({ where: { userId } });
+    let alreadyMine = false;
+    user.map((u)=>{    
+      if(u.pokemonId===pokemonId) {
+            alreadyMine = true
+        }
+    })
+
+    if (alreadyMine) return false;
+
+     await getRepository(UserPokemons).insert({ userId, pokemonId });
+
+     await getConnection()
+     .createQueryBuilder()
+     .update(Pokemon)
+     .set({ inMyPokemons: true })
+     .where("id = :id", { id: pokemonId })
+     .execute();
+
+      return true;
+  }
+
+
+  export async function deleteFromMyPokemons (userId: number, pokemonId: number) {
+
+    const pokemon = await getRepository(UserPokemons).findOne({ where: { userId,pokemonId } });
+
+    if(!pokemon) return false;
+
+    await getConnection()
+    .createQueryBuilder()
+    .delete()
+    .from(UserPokemons)
+    .where("userId = :userId AND pokemonId = :pokemonId", { userId, pokemonId })
+    .execute();
+
+      return pokemon;
+  }
+
+
