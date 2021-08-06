@@ -2,7 +2,7 @@ import supertest from "supertest";
 import { getConnection } from "typeorm";
 
 import app, { init } from "../../src/app";
-import { createUser } from "../factories/userFactory";
+import { createUser , createInvalidUser, insertUser} from "../factories/userFactory";
 import { clearDatabase } from "../utils/database";
 
 beforeAll(async () => {
@@ -17,20 +17,56 @@ afterAll(async () => {
   await getConnection().close();
 });
 
-describe("GET /users", () => {
-  it("should answer with text \"OK!\" and status 200", async () => {
+
+describe("POST /sign-up", () => {
+  it("should answer with status 400 for invalid email", async () => {
+    const user = await createInvalidUser();
+
+    const response = await supertest(app).post('/sign-up').send({
+      "email":user.email,
+      "password":user.password,
+      "confirmPassword": user.password
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("should answer with status 400 for different passwords", async () => {
     const user = await createUser();
 
-    const response = await supertest(app).get("/users");
-    
-    expect(response.body).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          email: user.email
-        })
-      ])
-    );
+    const response = await supertest(app).post('/sign-up').send({
+      "email":user.email,
+      "password":user.password,
+      "confirmPassword": "invalidPassword"
+    });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(400);
+  });
+
+
+  it("should answer with status 409 for email already registered", async () => {
+    const user = await createUser();
+    const existingUser = await insertUser(user);
+
+    const response = await supertest(app).post('/sign-up').send({
+      "email":existingUser.email,
+      "password":existingUser.password,
+      "confirmPassword": existingUser.password
+    });
+
+    expect(response.status).toBe(409);
+  });
+
+
+  it("should answer with status 201 for valid params", async () => {
+    const user = await createUser();
+
+    const response = await supertest(app).post('/sign-up').send({
+      "email":user.email,
+      "password":user.password,
+      "confirmPassword": user.password
+    });
+
+    expect(response.status).toBe(201);
   });
 });
