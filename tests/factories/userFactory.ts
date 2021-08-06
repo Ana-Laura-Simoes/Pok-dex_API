@@ -1,5 +1,6 @@
 import { getRepository } from "typeorm";
 import faker from "faker";
+import bcrypt from "bcrypt";
 
 import User from "../../src/entities/User";
 
@@ -26,7 +27,9 @@ export async function createInvalidUser () : Promise <user>{
 }
 
 export async function insertUser (user:user) :Promise <User> {
-  const newUser = await getRepository(User).create(user);
+  const {email,password}=user;
+  const hashedPassword = bcrypt.hashSync(password,10);
+  const newUser = await getRepository(User).create({email:email,password:hashedPassword});
   await getRepository(User).save(newUser);
   return newUser;
 }

@@ -49,9 +49,9 @@ describe("POST /sign-up", () => {
     const existingUser = await insertUser(user);
 
     const response = await supertest(app).post('/sign-up').send({
-      "email":existingUser.email,
-      "password":existingUser.password,
-      "confirmPassword": existingUser.password
+      "email":user.email,
+      "password":user.password,
+      "confirmPassword": user.password
     });
 
     expect(response.status).toBe(409);
@@ -69,4 +69,66 @@ describe("POST /sign-up", () => {
 
     expect(response.status).toBe(201);
   });
+});
+
+
+
+
+
+
+
+
+
+
+describe("POST /sign-in", () => {
+
+  it("should answer with status 400 for invalid email", async () => {
+    const user = await createInvalidUser();
+
+    const response = await supertest(app).post('/sign-in').send({
+      "email":user.email,
+      "password":user.password
+    });
+    expect(response.status).toBe(400);
+  });
+
+
+  it("should answer with status 401 for wrong user email", async () => {
+    const user = await createUser();
+    const newUser = await insertUser(user);
+
+    const response = await supertest(app).post('/sign-in').send({
+      "email":"notuser@email.com",
+      "password":user.password
+    });
+    expect(response.status).toBe(401);
+  });
+
+ it("should answer with status 401 for wrong user password", async () => {
+    const user = await createUser();
+    const newUser = await insertUser(user);
+
+    const response = await supertest(app).post('/sign-in').send({
+      "email": user.email,
+      "password": "notuser"
+    });
+    expect(response.status).toBe(401);
+  });
+
+
+  it("should answer with token and status 200 for valid params", async () => {
+    const user = await createUser();
+    const newUser = await insertUser(user);
+
+    const response = await supertest(app).post('/sign-in').send({
+      "email": user.email,
+      "password": user.password
+    });
+
+    expect(response.body).toEqual(
+        expect.objectContaining({token:expect.any(String)})
+    );
+    expect(response.status).toBe(200);
+  });
+
 });

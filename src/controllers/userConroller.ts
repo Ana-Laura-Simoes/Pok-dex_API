@@ -35,5 +35,5 @@ export async function signIn(req:Request, res: Response) {
   const token = await userService.SignIn({email,password});
   if(!token) return res.sendStatus(401);
   
-  return res.send({"token":token});
+  else return res.send({"token":token});
 }

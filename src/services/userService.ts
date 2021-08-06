@@ -47,21 +47,28 @@ export async function SignUp(user:user):Promise <Boolean> {
   if(existingUser) return false;
 
   else{
-    const newUser = await createUser(user);
+    await createUser(user);
     return true; 
   }
 }
 
-export async function SignIn(user:user): Promise <string>{
+export async function SignIn(user:user){
   
   const existingUser = await getUserByEmail(user.email);
-
-  if(!existingUser) return null;
+  
+  if(!existingUser) {
+    console.log(user.email)
+    console.log(existingUser)
+    console.log("aqui")
+    return false
+  }
    
   if(bcrypt.compareSync(user.password,existingUser.password)){
     const token = uuid();
-    const insertToken = await createSession(existingUser.id,token);
+    await createSession(existingUser.id,token);
     return token;
   }
-  else return null;
+  else {
+    console.log("aqui")
+    return false}
 }
