@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/sign-up",userController.signUp);
-app.post("/sign-in", (req,res)=>(console.log("oi")));
+app.post("/sign-in", userController.signIn);
 
 export async function init () {
   await connectDatabase();
