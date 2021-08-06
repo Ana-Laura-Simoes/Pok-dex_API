@@ -4,7 +4,7 @@ import faker from "faker";
 import UserPokemons from "../../src/entities/userPokemons"
 import Pokemon from "../../src/entities/Pokemon"; 
 
-export async function createPokemon() {
+export async function createPokemon() :Promise < Pokemon >{
     
     const repository = getRepository(Pokemon);
 
