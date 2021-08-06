@@ -11,12 +11,16 @@ interface user{
   password:string
 }
 
-export async function getUsers () {
-  const users = await getRepository(User).find({
-    select: ["id", "email"]
-  });
-  
-  return users;
+
+export async function validateSession(token: string) {
+  const repository = getRepository(Session);
+  const session = await repository.findOne({ where: { token }, relations: ["user"]});
+
+  if(!session) {
+    return false;
+  } else {
+    return session.user;
+  }
 }
 
 export async function createUser(newUser:user) {
