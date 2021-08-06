@@ -1,4 +1,4 @@
-import { getRepository, getConnection } from "typeorm";
+import { getRepository, getConnection, createQueryBuilder } from "typeorm";
 
 import Pokemon from "../entities/Pokemon";
 import UserPokemons from "../entities/userPokemons";
@@ -18,8 +18,10 @@ export async function MyPokemons(userId:number):Promise <number[]> {
   }
 
 export async function getPokemons (userId:number): Promise <Pokemon[]> {
-
-  const pokemons = await getRepository(Pokemon).find();
+  const repository = getRepository(Pokemon);
+ 
+  const pokemons =await repository.createQueryBuilder('pokemons').
+  orderBy('pokemons.id','ASC').getMany()
   
   const myList = await MyPokemons(userId)
 
