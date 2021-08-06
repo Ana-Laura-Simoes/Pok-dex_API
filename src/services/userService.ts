@@ -57,9 +57,6 @@ export async function SignIn(user:user){
   const existingUser = await getUserByEmail(user.email);
   
   if(!existingUser) {
-    console.log(user.email)
-    console.log(existingUser)
-    console.log("aqui")
     return false
   }
    
@@ -69,6 +66,5 @@ export async function SignIn(user:user){
     return token;
   }
   else {
-    console.log("aqui")
     return false}
 }
